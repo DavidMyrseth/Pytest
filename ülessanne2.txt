@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8" />
+  <title>Testid index.html</title>
+  <style>
+    .function-test {
+      border: 1px solid #ccc;
+      margin: 10px;
+      padding: 8px;
+      width: 300px;
+    }
+    .result {
+      margin-top: 5px;
+      font-weight: bold;
+    }
+    .pass {
+      color: green;
+    }
+    .fail {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+<h2>A-osa funktsioonid</h2>
+
+<div class="function-test">
+  <h4>abs_val(x)</h4>
+  <button onclick="testAbsVal()">Testi</button>
+  <div id="abs_val-result" class="result"></div>
+</div>
+
+<div class="function-test">
+  <h4>max3(a, b, c)</h4>
+  <button onclick="testMax3()">Testi</button>
+  <div id="max3-result" class="result"></div>
+</div>
+
+<div class="function-test">
+  <h4>repeat(s, n)</h4>
+  <button onclick="testRepeat()">Testi</button>
+  <div id="repeat-result" class="result"></div>
+</div>
+
+<div class="function-test">
+  <h4>first_last(s)</h4>
+  <button onclick="testFirstLast()">Testi</button>
+  <div id="first_last-result" class="result"></div>
+</div>
+
+<h2>B-osa funktsioonid</h2>
+
+<div class="function-test">
+  <h4>sum_unique(nums)</h4>
+  <button onclick="testSumUnique()">Testi</button>
+  <div id="sum_unique-result" class="result"></div>
+</div>
+
+<div class="function-test">
+  <h4>dict_invert(d)</h4>
+  <button onclick="testDictInvert()">Testi</button>
+  <div id="dict_invert-result" class="result"></div>
+</div>
+
+<div class="function-test">
+  <h4>take_while(nums, pred)</h4>
+  <button onclick="testTakeWhile()">Testi</button>
+  <div id="take_while-result" class="result"></div>
+</div>
+
+<script>
+  // Utiliit näitamiseks: showResult
+  function showResult(elementId, isPass, message) {
+    const el = document.getElementById(elementId);
+    el.textContent = message;
+    el.className = "result " + (isPass ? "pass" : "fail");
+  }
+
+  // Utiliit ujukomade võrdluseks
+  function approxEqual(a, b, tol=1e-6) {
+    return Math.abs(a - b) < tol;
+  }
+
+  // A-osa funktsioonid
+
+  // abs_val(x): tagasta |x|
+  function abs_val(x) {
+    return x < 0 ? -x : x;
+  }
+
+  // max3(a, b, c): tagasta kolmest suurim
+  function max3(a, b, c) {
+    return Math.max(a, b, c);
+  }
+
+  // repeat(s, n): tagasta sõne s korratud n korda (n>=0)
+  function repeat(s, n) {
+    if (n < 0) throw new Error("n peab olema >= 0");
+    return s.repeat(n);
+  }
+
+  // first_last(s): tagasta {first: esimene_täht, last: viimane_täht} (tühi -> null)
+  function first_last(s) {
+    if (!s || s.length === 0) return null;
+    return {first: s[0], last: s[s.length -1]};
+  }
+
+  // B-osa funktsioonid
+
+  // sum_unique(nums): summa unikaalsetest arvudest
+  function sum_unique(nums) {
+    const unique = new Set(nums);
+    let sum = 0;
+    for (const n of unique) {
+      sum += n;
+    }
+    return sum;
+  }
+
+  // dict_invert(d): väärtus->võti sõnastik (eeldusel, et väärtused on unikaalsed)
+  function dict_invert(d) {
+    const inv = {};
+    for (const k in d) {
+      if (d.hasOwnProperty(k)) {
+        const v = d[k];
+        if (inv.hasOwnProperty(v)) {
+          throw new Error("Väärtused ei ole unikaalsed");
+        }
+        inv[v] = k;
+      }
+    }
+    return inv;
+  }
+
+  // take_while(nums, pred): võta algusest, kuni pred on tõene
+  // pred - funktsioon, nt x => x > 0
+  function take_while(nums, pred) {
+    const res = [];
+    for (const n of nums) {
+      if (!pred(n)) break;
+      res.push(n);
+    }
+    return res;
+  }
+
+  // Testid
+
+  function testAbsVal() {
+    try {
+      const tests = [
+        {in:-5, exp:5},
+        {in:0, exp:0},
+        {in:7, exp:7},
+        {in:-3.14, exp:3.14}
+      ];
+      let pass = true;
+      for (const t of tests) {
+        const r = abs_val(t.in);
+        if (!approxEqual(r, t.exp)) pass = false;
+      }
+      showResult("abs_val-result", pass, pass ? "PASS" : "FAIL");
+    } catch(e) {
+      showResult("abs_val-result", false, "VIGA: "+e.message);
+    }
+  }
+
+  function testMax3() {
+    try {
+      const tests = [
+        {in:[1,2,3], exp:3},
+        {in:[-5,0,-1], exp:0},
+        {in:[7,7,7], exp:7},
+        {in:[10,9,10], exp:10}
+      ];
+      let pass = true;
+      for (const t of tests) {
+        const r = max3(...t.in);
+        if (r !== t.exp) pass = false;
+      }
+      showResult("max3-result", pass, pass ? "PASS" : "FAIL");
+    } catch(e) {
+      showResult("max3-result", false, "VIGA: "+e.message);
+    }
+  }
+
+  function testRepeat() {
+    try {
+      const tests = [
+        {in:["a", 3], exp:"aaa"},
+        {in:["ab", 2], exp:"abab"},
+        {in:["", 5], exp:""},
+        {in:["xyz", 0], exp:""}
+      ];
+      let pass = true;
+      for (const t of tests) {
+        const r = repeat(t.in[0], t.in[1]);
+        if (r !== t.exp) pass = false;
+      }
+      // Test negative n throws error
+      let threw = false;
+      try {
+        repeat("a", -1);
+      } catch {
+        threw = true;
+      }
+      if (!threw) pass = false;
+
+      showResult("repeat-result", pass, pass ? "PASS" : "FAIL");
+    } catch(e) {
+      showResult("repeat-result", false, "VIGA: "+e.message);
+    }
+  }
+
+  function testFirstLast() {
+    try {
+      const tests = [
+        {in:"abc", exp:{first:"a", last:"c"}},
+        {in:"x", exp:{first:"x", last:"x"}},
+        {in:"", exp:null},
+        {in:null, exp:null},
+      ];
+      let pass = true;
+      for (const t of tests) {
+        const r = first_last(t.in);
+        if (t.exp === null) {
+          if (r !== null) pass = false;
+        } else {
+          if (r.first !== t.exp.first || r.last !== t.exp.last) pass = false;
+        }
+      }
+      showResult("first_last-result", pass, pass ? "PASS" : "FAIL");
+    } catch(e) {
+      showResult("first_last-result", false, "VIGA: "+e.message);
+    }
+  }
+
+  function testSumUnique() {
+    try {
+      const tests = [
+        {in:[1,2,2,3], exp:6},
+        {in:[], exp:0},
+        {in:[5,5,5], exp:5},
+        {in:[-1,1,-1,2], exp:2}
+      ];
+      let pass = true;
+      for (const t of tests) {
+        const r = sum_unique(t.in);
+        if (r !== t.exp) pass = false;
+      }
+      showResult("sum_unique-result", pass, pass ? "PASS" : "FAIL");
+    } catch(e) {
+      showResult("sum_unique-result", false, "VIGA: "+e.message);
+    }
+  }
+
+  function testDictInvert() {
+    try {
+      const tests = [
+        {in:{"a":1, "b":2, "c":3}, exp:{"1":"a","2":"b","3":"c"}},
+      ];
+      let pass = true;
+      for (const t of tests) {
+        const r = dict_invert(t.in);
+        // Võrdleme JSON stringidega mugavamalt
+        if (JSON.stringify(r) !== JSON.stringify(t.exp)) pass = false;
+      }
+      // Test unikaalsuse rikkumine
+      let threw = false;
+      try {
+        dict_invert({"a":1,"b":1});
+      } catch {
+        threw = true;
+      }
+      if (!threw) pass = false;
+
+      showResult("dict_invert-result", pass, pass ? "PASS" : "FAIL");
+    } catch(e) {
+      showResult("dict_invert-result", false, "VIGA: "+e.message);
+    }
+  }
+
+  function testTakeWhile() {
+    try {
+      const pred = x => x > 0;
+      const tests = [
+        {in:[1,2,3,-1,4], exp:[1,2,3]},
+        {in:[-1,2,3], exp:[]},
+        {in:[1,1,1], exp:[1,1,1]},
+        {in:[], exp:[]}
+      ];
+      let pass = true;
+      for (const t of tests) {
+        const r = take_while(t.in, pred);
+        if (JSON.stringify(r) !== JSON.stringify(t.exp)) pass = false;
+      }
+      showResult("take_while-result", pass, pass ? "PASS" : "FAIL");
+    } catch(e) {
+      showResult("take_while-result", false, "VIGA: "+e.message);
+    }
+  }
+
+</script>
+
+</body>
+</html>
