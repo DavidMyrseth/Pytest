@@ -66,5 +66,3 @@ def median(nums):
 def unique_letters(s):
     """Tagasta unikaalsete tähestikuliste märkide hulk väiketähtedena."""
     return {c.lower() for c in s if c.isalpha()}
-
-
